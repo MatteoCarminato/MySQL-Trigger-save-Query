@@ -53,9 +53,9 @@ SET global log_output = 'table';
 ## Create TRIGGER / Criando a TRIGGER:
 ### UPDATE
 ```sql
-DELIMITER $$
-DROP TRIGGER IF EXISTS `update_table_users`$$
-CREATE TRIGGER `update_table_users` 
+DELIMITER $$ 
+DROP TRIGGER IF EXISTS `insert_table_users`$$
+CREATE TRIGGER `insert_table_users`  
 BEFORE UPDATE ON `user` 
 FOR EACH ROW BEGIN 
 SELECT argument INTO @tquery FROM mysql.general_log where thread_id = connection_id() and argument like 'UPDATE%' order by event_time desc limit 1;
@@ -68,12 +68,12 @@ SET  action = 'UPDATE',
      query = CONVERT( @tquery USING utf8 ),
      `create_time` = NOW();
 
-END;
+ END $$
 ```
 
 ### INSERT
 ```sql
-DELIMITER $$
+DELIMITER $$ 
 DROP TRIGGER IF EXISTS `insert_table_users`$$
 CREATE TRIGGER `insert_table_users` 
 BEFORE INSERT ON `user` 
@@ -81,14 +81,14 @@ FOR EACH ROW BEGIN
 SELECT argument INTO @tquery FROM mysql.general_log where thread_id = connection_id() and argument like 'INSERT%' order by event_time desc limit 1;
 INSERT INTO user_logs
 SET  action = 'INSERT',
-     user_id = OLD.id,
-     user_username = OLD.username,
-     user_email = OLD.email,
-     user_password = OLD.password,
+     user_id = id,
+     user_username = username,
+     user_email = email,
+     user_password = password,
      query = CONVERT( @tquery USING utf8 ),
      `create_time` = NOW();
 
-END;
+END $$
 ```
 
 ### DELETE
@@ -108,7 +108,7 @@ SET  action = 'DELETE',
      query = CONVERT( @tquery USING utf8 ),
      `create_time` = NOW();
 
-END;
+END $$
 ```
 
 ## Authors / Autor
